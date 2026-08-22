@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YOUUGRA</title>
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ШАПКА -->
+  <header class="header">
+    <div class="header-brand">
+      <h1 class="logo">YOUUGRA</h1>
+      <p class="tagline">ТРЕКЕР РЕАЛЬНОЙ ЖИЗНИ</p>
+      <p class="save-status" id="saveStatus"></p>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item">
+        <span class="meta-label">ДЕНЬ</span>
+        <span class="meta-value" id="dayNumber">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">СЕРИЯ</span>
+        <span class="meta-value" id="streak">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">ДАТА</span>
+        <span class="meta-value meta-date" id="todayDate">—</span>
+      </div>
+    </div>
+    <div class="header-center-btns">
+      <button class="action-hdr-btn" id="btnActionOpen" title="Действие дня">
+        <img src="groundhog.jpg" class="action-btn-img" alt="">
+      </button>
+      <button class="horizons-hdr-btn" id="btnHorizonsOpen" title="Что узнать сегодня">💡</button>
+      <button class="challenge-header-btn" id="btnOpenChallenge" title="Битва с боссом">⚔</button>
+    </div>
+    <div class="header-xp">
+      <div class="xp-info">
+        <span class="xp-label">УР. <span id="currentLevel">0</span></span>
+        <span class="xp-numbers" id="xpNumbers">0 / 350</span>
+      </div>
+      <div class="xp-track">
+        <div class="xp-fill" id="xpFill"></div>
+      </div>
+      <div class="xp-sublabel">до ур. <span id="nextLevel">1</span> · <span id="xpToNext">350</span> xp</div>
+      <div class="xp-forecast" id="xpForecast"></div>
+    </div>
+    <div class="virtue-wrap" id="virtueOrb" title="Добродетель">
+      <div class="virtue-ring"></div>
+      <div class="virtue-ring virtue-ring-slow"></div>
+      <div class="virtue-face">
+        <span class="virtue-symbol">✦</span>
+        <span class="virtue-num" id="virtueNum">0</span>
+        <span class="virtue-label">ДОБРОДЕТЕЛЬ</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <main class="main">
+
+    <!-- ЛЕВАЯ ПАНЕЛЬ — персонаж -->
+    <aside class="panel panel-left">
+
+      <!-- ПОРТРЕТ -->
+      <div class="portrait-section" id="portraitSection">
+        <div class="portrait-wrap" id="portraitWrap">
+          <img src="portrait.jpg" id="portraitImg" class="portrait-img" alt="UГРОК">
+          <!-- стилизующий оверлей -->
+          <div class="portrait-color-grade"></div>
+          <!-- оверлеи состояний -->
+          <div class="portrait-vignette"></div>
+          <div class="portrait-debuff-fog" id="portraitDebuffFog"></div>
+          <div class="portrait-streak-glow" id="portraitStreakGlow"></div>
+          <!-- подвал портрета -->
+          <div class="portrait-footer">
+            <span class="portrait-name">UГРОК</span>
+            <span class="portrait-lvl" id="portraitLvl">УР. 0</span>
+          </div>
+        </div>
+        <!-- плашка состояния под портретом -->
+        <div class="portrait-state-bar">
+          <span class="portrait-state-label" id="portraitStateLabel">НАЧАЛО ПУТИ</span>
+          <span class="portrait-state-hint" id="portraitStateHint"></span>
+        </div>
+      </div>
+
+      <section class="panel-section">
+        <h2 class="section-title">ХАРАКТЕРИСТИКИ</h2>
+        <div id="characteristicsContainer"></div>
+      </section>
+
+      <section class="panel-section">
+        <h2 class="section-title">НАВЫКИ</h2>
+        <div id="skillsContainer"></div>
+      </section>
+
+    </aside>
+
+    <!-- ПРАВАЯ ПАНЕЛЬ — расписание -->
+    <section class="panel panel-right">
+
+      <div class="schedule-header">
+        <div>
+          <h2 class="section-title" id="scheduleTitle">ПЛАН НА СЕГОДНЯ</h2>
+          <p class="schedule-date" id="scheduleDate">—</p>
+        </div>
+        <div class="schedule-controls">
+          <button class="btn-icon" id="btnAddQuest" title="Добавить задание">＋</button>
+          <button class="btn-icon" id="btnCalendar" title="Календарь">▦</button>
+        </div>
+      </div>
+
+      <div class="quest-list" id="questList"></div>
+
+      <!-- нарушения дня -->
+      <div class="day-demerits" id="dayDemerits"></div>
+
+      <div class="day-footer">
+        <div>
+          <span class="footer-label">ИТОГО XP</span>
+          <span class="footer-value" id="todayXp">0 XP</span>
+        </div>
+        <div>
+          <span class="footer-label">ШТРАФЫ</span>
+          <span class="footer-value footer-penalty" id="todayPenalty">0 XP</span>
+        </div>
+        <div>
+          <span class="footer-label">КВЕСТЫ</span>
+          <span class="footer-value" id="todayNet">0 XP</span>
+        </div>
+        <div>
+          <span class="footer-label">ВЫПОЛНЕНО</span>
+          <span class="footer-value" id="progressText">0 / 0</span>
+        </div>
+      </div>
+
+
+    </section>
+  </main>
+
+  <!-- МОДАЛ: добавить / редактировать задание -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3 class="modal-title" id="modalTitle">НОВОЕ ЗАДАНИЕ</h3>
+      <div class="form-group">
+        <label class="form-label">НАЗВАНИЕ</label>
+        <input type="text" class="form-input" id="inputName" placeholder="Название задания...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ДЕТАЛИ</label>
+        <input type="text" class="form-input" id="inputDetail" placeholder="Подробности (необязательно)...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">XP НАГРАДА</label>
+          <input type="number" class="form-input" id="inputXp" min="1" max="100" value="5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">НАВЫК</label>
+          <select class="form-input" id="inputSkill">
+            <option value="">— нет —</option>
+            <option value="body">Спорт</option>
+            <option value="health">Здоровье / шея</option>
+            <option value="psychology">Психология</option>
+            <option value="income">Заработок</option>
+            <option value="horizons">Кругозор</option>
+            <option value="style">Стиль</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="btnModalSave">СОХРАНИТЬ</button>
+        <button class="btn-ghost" id="btnModalCancel">ОТМЕНА</button>
+        <button class="btn-danger" id="btnModalDelete" style="display:none">УДАЛИТЬ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ: календарь -->
+  <div class="modal-overlay" id="calendarOverlay">
+    <div class="modal modal-calendar">
+
+      <!-- навигация по месяцам -->
+      <div class="cal-nav">
+        <button class="cal-nav-btn" id="btnCalPrev">←</button>
+        <span class="cal-month-label" id="calMonthLabel">МАЙ 2026</span>
+        <button class="cal-nav-btn" id="btnCalNext">→</button>
+      </div>
+
+      <!-- сетка календаря -->
+      <div class="calendar-grid" id="calendarGrid"></div>
+
+      <!-- детали дня (скрыты по умолчанию) -->
+      <div class="cal-day-detail" id="calDayDetail" style="display:none"></div>
+
+      <div class="modal-actions" style="margin-top:14px">
+        <button class="btn-ghost" id="btnCalClose">ЗАКРЫТЬ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ: история навыка / характеристики -->
+  <div class="modal-overlay" id="historyOverlay">
+    <div class="modal">
+      <h3 class="modal-title" id="historyModalTitle">ИСТОРИЯ</h3>
+      <p class="virtue-desc" id="historyModalSubtitle"></p>
+      <div id="historyActsList" style="margin-top:16px; max-height:320px; overflow-y:auto;"></div>
+      <div class="modal-actions" style="margin-top:12px">
+        <button class="btn-ghost" id="btnHistoryClose">ЗАКРЫТЬ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ: добродетель -->
+  <div class="modal-overlay" id="virtueOverlay">
+    <div class="modal">
+      <h3 class="modal-title" style="color: var(--green)">ДОБРОДЕТЕЛЬ</h3>
+      <p class="virtue-desc">Добрых поступков совершено: <span class="virtue-count" id="virtueModalCount">0</span></p>
+      <p class="virtue-desc" style="margin-top:8px; color: var(--text-dim)">
+        Каждое воскресенье — тайный квест. Система не говорит что делать.
+      </p>
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label">ЗАПИСАТЬ ПОСТУПОК</label>
+        <input type="text" class="form-input" id="inputVirtueDesc" placeholder="Что сделал...">
+      </div>
+      <div class="modal-actions" style="margin-top:12px">
+        <button class="btn-primary" id="btnVirtueAdd">ДОБАВИТЬ</button>
+        <button class="btn-ghost" id="btnVirtueClose">ЗАКРЫТЬ</button>
+      </div>
+      <div id="virtueActsList" style="margin-top:16px; max-height:200px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ: стиль (купленные вещи) -->
+  <div class="modal-overlay" id="styleOverlay">
+    <div class="modal">
+      <h3 class="modal-title">СТИЛЬ</h3>
+      <p class="virtue-desc">Куплено вещей: <span class="virtue-count" id="styleModalCount">0</span> · уровень <span class="virtue-count" id="styleModalLevel">0</span></p>
+      <p class="virtue-desc" style="margin-top:4px; color: var(--text-dim)" id="styleModalProgress"></p>
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label">ЧТО КУПИЛ</label>
+        <input type="text" class="form-input" id="inputStyleName" placeholder="Название вещи...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">XP НАГРАДА</label>
+        <input type="number" class="form-input" id="inputStyleXp" min="1" max="100" value="4">
+      </div>
+      <div class="modal-actions" style="margin-top:12px">
+        <button class="btn-primary" id="btnStyleAdd">КУПИЛ</button>
+        <button class="btn-ghost" id="btnStyleClose">ЗАКРЫТЬ</button>
+      </div>
+      <div id="styleItemsList" style="margin-top:16px; max-height:200px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ: БИТВА С БОССОМ -->
+  <div class="modal-overlay" id="bossBattleOverlay">
+    <div class="boss-battle-modal">
+      <button class="boss-battle-close" id="btnBossBattleClose">✕</button>
+      <div class="boss-arena">
+
+        <!-- Колонка 1: ДЕД СМАЙ -->
+        <div class="boss-left">
+          <div class="boss-goblin-img" id="bossGoblinImg"></div>
+          <div class="boss-name-label">ДЕД СМАЙ</div>
+        </div>
+
+        <!-- Колонка 2: отжимающийся -->
+        <div class="boss-pushup-wrap">
+          <div class="boss-pushup-img" id="bossPushupImg"></div>
+        </div>
+
+        <!-- Колонка 3: управление -->
+        <div class="boss-right">
+          <div class="boss-counter">
+            <span class="boss-counter-num" id="bossCount">0</span>
+            <span class="boss-counter-label">ПОВТОРОВ</span>
+          </div>
+          <!-- Темп счёта -->
+          <div class="boss-tempo" id="bossTempoWrap">
+            <button class="tempo-btn active" data-tempo="slow">МЕДЛ</button>
+            <button class="tempo-btn" data-tempo="mid">СР</button>
+            <button class="tempo-btn" data-tempo="fast">БЫСТР</button>
+          </div>
+          <!-- Длительность тренировки -->
+          <div class="boss-time-pick" id="bossTimePick"></div>
+          <div class="boss-btns">
+            <button class="boss-btn-start" id="bossBtnStart">СТАРТ</button>
+            <button class="boss-btn-pause" id="bossBtnPause" disabled>ПАУЗА</button>
+            <button class="boss-btn-stop" id="bossBtnStop" disabled>СТОП</button>
+          </div>
+          <div class="boss-result" id="bossResult"></div>
+        </div>
+
+        <!-- Таймер — полная ширина под ареной -->
+        <div class="boss-timer-bar" id="bossTimerBar" style="display:none">
+          <div class="btb-elapsed">
+            <span class="btb-num" id="bossElapsedNum">00:00</span>
+            <span class="btb-label">прошло</span>
+          </div>
+          <div class="btb-track">
+            <div class="btb-fill" id="bossTimerFill"></div>
+          </div>
+          <div class="btb-remaining">
+            <span class="btb-num danger" id="bossRemainingNum">00:00</span>
+            <span class="btb-label">осталось</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- История зачислений -->
+      <div class="boss-history-bar">
+        <button class="btn-ghost boss-history-toggle" id="btnBossHistory">ИСТОРИЯ ЗАЧИСЛЕНИЙ ▾</button>
+        <div class="boss-history-wrap" id="bossHistoryWrap" style="display:none">
+          <div class="boss-history-list" id="bossHistoryList"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- МОДАЛ: Действие дня -->
+  <div class="modal-overlay" id="actionOverlay">
+    <div class="modal action-modal">
+      <img src="groundhog.jpg" class="action-modal-img" alt="">
+      <h3 class="modal-title">Действие дня</h3>
+      <div id="actionBlock" style="margin-top:14px"></div>
+      <div class="modal-actions" style="margin-top:14px">
+        <button class="btn-ghost" id="btnActionClose">ЗАКРЫТЬ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛ: Кругозор дня -->
+  <div class="modal-overlay" id="horizonsOverlay">
+    <div class="modal">
+      <h3 class="modal-title" style="color:var(--gold)">О чём узнать сегодня?</h3>
+      <div id="horizonsBlock" style="margin-top:14px"></div>
+      <div class="modal-actions" style="margin-top:14px">
+        <button class="btn-ghost" id="btnHorizonsClose">ЗАКРЫТЬ</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="statTooltip" class="stat-tooltip"></div>
+  <script src="app.js"></script>
+</body>
+</html>
