@@ -3,29 +3,56 @@
 // ============================================================
 // SUPABASE — облачное хранилище прогресса (отдельный сайт, без claude.ai)
 // ============================================================
+//
+// Домен *.supabase.co заблокирован в РФ (DNS + IP), поэтому браузер не ходит
+// на Supabase напрямую, а через reverse-proxy на Netlify:
+//   /db/<table>?<query>  →  <SUPABASE_URL>/rest/v1/<table>?<query>
+// Прокси — edge-функция netlify/edge-functions/db.ts, ключ подставляется на
+// стороне Netlify. С netlify.app-зеркала это same-origin запрос, с github.io —
+// кросс-доменный на youugra.netlify.app (CORS отдаёт та же edge-функция).
+// Прямой адрес Supabase остаётся запасным: сработает вне РФ или если Netlify
+// недоступен.
 
 const SUPABASE_URL   = 'https://ympdquhyyywxgazhlvet.supabase.co';
 const SUPABASE_KEY   = 'sb_publishable_yzyzkIxCZKW1q3EDr4mYrA_BPrV_c_z';
 const STATE_ROW_ID    = 'main';
 const SUPABASE_TABLE  = 'youugra_state';
 
+const DB_PROXY_BASE  = location.hostname.endsWith('netlify.app')
+  ? '/db'
+  : 'https://youugra.netlify.app/db';
+const DB_DIRECT_BASE = `${SUPABASE_URL}/rest/v1`;
+
+// Запрос к базе: сначала через прокси (работает в РФ), при сетевой ошибке —
+// напрямую в Supabase (работает вне РФ). HTTP-ответ с кодом ошибки (4xx/5xx)
+// на прямой адрес не откатывает — это уже ответ базы, отдаём как есть.
+async function dbFetch(path, init = {}) {
+  try {
+    return await fetch(`${DB_PROXY_BASE}/${path}`, init);
+  } catch (_) {
+    const direct = {
+      ...init,
+      headers: {
+        ...(init.headers || {}),
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+    };
+    return fetch(`${DB_DIRECT_BASE}/${path}`, direct);
+  }
+}
+
 async function loadStateFromCloud() {
-  const url = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${STATE_ROW_ID}&select=data`;
-  const res = await fetch(url, {
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-  });
+  const res = await dbFetch(`${SUPABASE_TABLE}?id=eq.${STATE_ROW_ID}&select=data`);
   if (!res.ok) throw new Error('supabase load failed: ' + res.status);
   const rows = await res.json();
   return rows.length ? rows[0].data : null;
 }
 
 async function saveStateToCloud(state) {
-  const url = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`;
-  const res = await fetch(url, {
+  const res = await dbFetch(SUPABASE_TABLE, {
     method: 'POST',
     headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
       Prefer: 'resolution=merge-duplicates',
     },
