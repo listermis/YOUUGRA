@@ -1,0 +1,6 @@
+# Reverse-proxy к Supabase REST через Netlify Edge: браузер обращается к /db/*,
+# минуя заблокированный в РФ домен *.supabase.co.
+# Реализация — netlify/edge-functions/db.ts.
+[[edge_functions]]
+  path = "/db/*"
+  function = "db"
